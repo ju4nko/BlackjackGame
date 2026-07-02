@@ -9,21 +9,26 @@ import SwiftUI
 
 struct CardView: View {
     let card: Card
+    var isFaceDown: Bool = false
     
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 8)
-                .fill(.white)
+                .fill(isFaceDown ? .blue : .white)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8).stroke(.gray, lineWidth: 1)
-                        
+                    
                 )
-            Text("\(card.valor.etiqueta)\(card.palo.simbolo)")
-                .foregroundStyle(card.palo.color)
+            if !isFaceDown {
+                Text("\(card.valor.etiqueta)\(card.palo.simbolo)")
+                    .foregroundStyle(card.palo.color)
+            }
+            
         }
         .shadow(radius: 3)
         .frame(width: 60, height: 90)
     }
+    
 }
 
 #Preview {

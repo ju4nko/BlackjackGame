@@ -19,10 +19,11 @@ struct ContentView: View {
                 case .empate: Text("¡Empate!")
                 }
             }
-            Text("Crupier: \(juego.dealerHand.total)")
+            Text("Crupier: \(textoCrupier)")
+            
             HStack {
-                ForEach(juego.dealerHand.cards) { card in
-                    CardView(card: card)
+                ForEach(Array(juego.dealerHand.cards.enumerated()), id: \.element.id) { indice, card in
+                    CardView(card: card, isFaceDown: indice == 1 && juego.state == .playerTurn)
                 }
             }
             Text("Jugador: \(juego.playerHand.total)")
@@ -48,7 +49,21 @@ struct ContentView: View {
         }
         .padding()
     }
+    
+    var textoCrupier: String {
+        if juego.state == .playerTurn {
+            if let primera = juego.dealerHand.cards.first {
+                return "\(primera.valor.value)"
+            } else {
+                return "0"
+            }
+        } else {
+            return "\(juego.dealerHand.total)"
+        }
+    }
 }
+
+
 
 #Preview {
     ContentView()

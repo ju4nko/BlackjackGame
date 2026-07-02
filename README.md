@@ -57,8 +57,8 @@ Toda la lógica vive en el modelo y es independiente de la interfaz, lo que perm
 
 ## 🗺️ Próximas mejoras
 
-- [ ] Ocultar la primera carta del crupier durante el turno del jugador
-- [ ] Diseño del reverso de las cartas (carta boca abajo)
+- [x] Ocultar la carta oculta del crupier durante el turno del jugador
+- [x] Diseño del reverso de las cartas (carta boca abajo)
 - [ ] Sistema de fichas y apuestas
 - [ ] Animaciones al repartir cartas
 - [ ] Sonidos
