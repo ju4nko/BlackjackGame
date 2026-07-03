@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var juego = BlackjackGame()
-
+    
     var body: some View {
         VStack {
             Spacer()
@@ -34,7 +34,6 @@ struct ContentView: View {
                         CardView(card: card)
                     }
                 }
-                Text("Apuesta: \(juego.apuesta)€")
             } else {
                 Text("Elija su apuesta")
             }
@@ -46,11 +45,23 @@ struct ContentView: View {
                     Button("25€") { juego.añadirApuesta(25) }.disabled(juego.apuesta + 25 > juego.saldo)
                     Button("50€") { juego.añadirApuesta(50) }.disabled(juego.apuesta + 50 > juego.saldo)
                 }
-                Button("Apostar") { juego.apostar(juego.apuesta) }
+                Button("Apostar") {
+                    withAnimation {
+                        juego.apostar(juego.apuesta)
+                    }
+                }
             case .playerTurn:
                 HStack {
-                    Button("Pedir") { juego.pedirCarta() }
-                    Button("Plantarse") { juego.plantarse() }
+                    Button("Pedir") {
+                        withAnimation {
+                            juego.pedirCarta()
+                        }
+                    }
+                    Button("Plantarse") {
+                        withAnimation {
+                            juego.plantarse()
+                        }
+                    }
                 }
             case .dealerTurn:
                 EmptyView()
@@ -58,6 +69,7 @@ struct ContentView: View {
             case .finished:
                 Button("Nueva ronda") { juego.nuevaRonda() }
             }
+            
             Spacer()
             Text("Apuesta total: \(juego.apuesta)€")
             Text("Saldo: \(juego.saldo)€")
