@@ -42,10 +42,11 @@ struct ContentView: View {
             case .betting:
                 // Botones de apuesta
                 HStack {
-                    Button("10€") { juego.apostar(10) }
-                    Button("25€") { juego.apostar(25) }
-                    Button("50€") { juego.apostar(50) }
+                    Button("10€") { juego.añadirApuesta(10) }.disabled(juego.apuesta + 10 > juego.saldo)
+                    Button("25€") { juego.añadirApuesta(25) }.disabled(juego.apuesta + 25 > juego.saldo)
+                    Button("50€") { juego.añadirApuesta(50) }.disabled(juego.apuesta + 50 > juego.saldo)
                 }
+                Button("Apostar") { juego.apostar(juego.apuesta) }
             case .playerTurn:
                 HStack {
                     Button("Pedir") { juego.pedirCarta() }
@@ -58,7 +59,8 @@ struct ContentView: View {
                 Button("Nueva ronda") { juego.nuevaRonda() }
             }
             Spacer()
-            Text("Fichas: \(juego.saldo)€")
+            Text("Apuesta total: \(juego.apuesta)€")
+            Text("Saldo: \(juego.saldo)€")
         }
         .padding()
     }

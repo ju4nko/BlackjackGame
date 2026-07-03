@@ -72,13 +72,14 @@ class BlackjackGame {
         terminar()
     }
     
+
     func apostar(_ cantidad: Int) {
-        if cantidad <= saldo {
-            apuesta = cantidad
-            saldo -= apuesta
-            nuevaPartida()
-        }
-        
+        saldo -= cantidad     // descuento único aquí
+        nuevaPartida()
+    }
+    
+    func añadirApuesta(_ cantidad: Int) {
+       apuesta += cantidad
     }
     
     func resolver() {
