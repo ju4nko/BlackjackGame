@@ -12,6 +12,7 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
+            Spacer()
             if let resultado = juego.resultado {
                 switch resultado {
                 case .ganaJugador: Text("¡Has ganado!")
@@ -19,33 +20,45 @@ struct ContentView: View {
                 case .empate: Text("¡Empate!")
                 }
             }
-            Text("Crupier: \(textoCrupier)")
-            
-            HStack {
-                ForEach(Array(juego.dealerHand.cards.enumerated()), id: \.element.id) { indice, card in
-                    CardView(card: card, isFaceDown: indice == 1 && juego.state == .playerTurn)
+            if juego.state != .betting {
+                Text("Crupier: \(textoCrupier)")
+                
+                HStack {
+                    ForEach(Array(juego.dealerHand.cards.enumerated()), id: \.element.id) { indice, card in
+                        CardView(card: card, isFaceDown: indice == 1 && juego.state == .playerTurn)
+                    }
                 }
-            }
-            Text("Jugador: \(juego.playerHand.total)")
-            HStack {
-                ForEach(juego.playerHand.cards) { card in
-                    CardView(card: card)
+                Text("Jugador: \(juego.playerHand.total)")
+                HStack {
+                    ForEach(juego.playerHand.cards) { card in
+                        CardView(card: card)
+                    }
                 }
+                Text("Apuesta: \(juego.apuesta)€")
+            } else {
+                Text("Elija su apuesta")
             }
-            Button("Nueva Partida") {
-                juego.nuevaPartida()
-            }
-            HStack {
-                Button("Pedir") {
-                    juego.pedirCarta()
+            switch juego.state {
+            case .betting:
+                // Botones de apuesta
+                HStack {
+                    Button("10€") { juego.apostar(10) }
+                    Button("25€") { juego.apostar(25) }
+                    Button("50€") { juego.apostar(50) }
                 }
-                .disabled(juego.state != .playerTurn)
-                Button("Plantarse") {
-                    juego.plantarse()
+            case .playerTurn:
+                HStack {
+                    Button("Pedir") { juego.pedirCarta() }
+                    Button("Plantarse") { juego.plantarse() }
                 }
-                .disabled(juego.state != .playerTurn)
+            case .dealerTurn:
+                EmptyView()
+                
+            case .finished:
+                Button("Nueva ronda") { juego.nuevaRonda() }
             }
-            
+            Spacer()
+            Text("Fichas: \(juego.saldo)€")
         }
         .padding()
     }

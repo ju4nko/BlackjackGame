@@ -13,6 +13,8 @@ class BlackjackGame {
     var playerHand: Hand
     var dealerHand: Hand
     var state: GameState
+    var saldo: Int = 100
+    var apuesta: Int = 0
     
     var resultado: Resultado? {
         if state != .finished { return nil }
@@ -27,7 +29,7 @@ class BlackjackGame {
         baraja = Deck()
         playerHand = Hand()
         dealerHand = Hand()
-        state = .playerTurn
+        state = .betting
     }
     
     func repartir(a: inout Hand) {
@@ -44,7 +46,7 @@ class BlackjackGame {
         repartir(a: &dealerHand)
         state = .playerTurn
         if dealerHand.isBlackjack {
-            state = .finished
+            terminar()
         }
         if playerHand.isBlackjack {
             plantarse()
@@ -55,7 +57,7 @@ class BlackjackGame {
     func pedirCarta() {
         repartir(a: &playerHand)
         if playerHand.isBust {
-            state = .finished
+            terminar()
         }
         if playerHand.total == 21 {
             plantarse()
@@ -67,12 +69,41 @@ class BlackjackGame {
         while dealerHand.total < 17 {
             repartir(a: &dealerHand)
         }
+        terminar()
+    }
+    
+    func apostar(_ cantidad: Int) {
+        if cantidad <= saldo {
+            apuesta = cantidad
+            saldo -= apuesta
+            nuevaPartida()
+        }
+        
+    }
+    
+    func resolver() {
+        switch resultado {
+        case .ganaJugador: saldo += apuesta * 2
+        case .ganaCrupier: break
+        case .empate: saldo += apuesta
+        case .none: break
+        }
+    }
+    
+    func terminar() {
         state = .finished
+        resolver()
+    }
+    
+    func nuevaRonda() {
+        apuesta = 0
+        state = .betting
     }
     
 }
 
 enum GameState {
+    case betting
     case playerTurn
     case dealerTurn
     case finished
