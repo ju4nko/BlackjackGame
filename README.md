@@ -11,14 +11,18 @@ Proyecto desarrollado paso a paso como ejercicio de aprendizaje de Swift y Swift
 - Detección de **bust** (pasarse de 21) y **blackjack natural** (21 con dos cartas).
 - IA del crupier con la regla estándar de casino: pide cartas hasta llegar a 17.
 - Determinación automática del ganador (jugador, crupier o empate).
+- **Sistema de fichas y apuestas**: apuesta acumulable antes de cada mano, con saldo que sube o baja según el resultado.
+- **Carta oculta del crupier** durante el turno del jugador (como en el casino), revelada al terminar.
 - Interfaz reactiva con SwiftUI: las cartas y los totales se actualizan solos.
 - Cartas dibujadas con su símbolo (♥ ♦ ♣ ♠) y color correspondiente.
+- **Tests unitarios** con el framework Testing que cubren la lógica crítica.
 
 ## 🎮 Cómo se juega
 
-1. Pulsa **Nueva Partida** para repartir.
+1. **Elige tu apuesta** con los botones de fichas y pulsa **Apostar** para repartir.
 2. **Pedir** para robar otra carta, o **Plantarse** para pasar el turno al crupier.
 3. Si te pasas de 21, pierdes. Si no, el crupier juega y se compara quién se acerca más a 21.
+4. El saldo se ajusta según el resultado. Pulsa **Nueva ronda** para volver a apostar.
 
 ## 🏗️ Arquitectura
 
@@ -29,9 +33,10 @@ El proyecto separa claramente el modelo de datos de la vista:
 | `Models/Card.swift` | La carta: palo, valor, puntuación y representación visual |
 | `Models/Deck.swift` | La baraja: generar 52 cartas, barajar y repartir |
 | `Models/Hand.swift` | Una mano: total con As flexible, detección de bust y blackjack |
-| `Models/BlackjackGame.swift` | El motor del juego: reparto, turnos, IA del crupier y resultado |
-| `Views/CardView.swift` | Vista de una carta individual |
+| `Models/BlackjackGame.swift` | El motor del juego: reparto, turnos, IA del crupier, apuestas y resultado |
+| `Views/CardView.swift` | Vista de una carta individual (boca arriba o boca abajo) |
 | `Views/ContentView.swift` | Pantalla principal del juego |
+| `BlackjackGameTests/BlackjackGameTests.swift` | Tests unitarios de la lógica del juego |
 
 Toda la lógica vive en el modelo y es independiente de la interfaz, lo que permite probarla y reutilizarla con cualquier UI.
 
@@ -40,6 +45,7 @@ Toda la lógica vive en el modelo y es independiente de la interfaz, lo que perm
 - **Swift**
 - **SwiftUI**
 - **`@Observable`** (Observation framework) para el estado reactivo
+- **Testing** framework para los tests unitarios
 
 ## 🚀 Cómo ejecutar
 
@@ -59,7 +65,9 @@ Toda la lógica vive en el modelo y es independiente de la interfaz, lo que perm
 
 - [x] Ocultar la carta oculta del crupier durante el turno del jugador
 - [x] Diseño del reverso de las cartas (carta boca abajo)
-- [ ] Sistema de fichas y apuestas
+- [x] Sistema de fichas y apuestas
+- [x] Tests unitarios con el framework Testing
 - [ ] Animaciones al repartir cartas
 - [ ] Sonidos
-- [ ] Tests unitarios con el framework Testing
+- [ ] Pantalla de fin de juego al quedarse sin fichas
+- [ ] Pago especial 3:2 para el blackjack natural
