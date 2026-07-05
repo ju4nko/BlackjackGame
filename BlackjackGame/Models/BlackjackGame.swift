@@ -33,7 +33,10 @@ class BlackjackGame {
     }
     
     func repartir(a: inout Hand) {
-        if let carta = baraja.draw() { a.add(carta) }
+        if let carta = baraja.draw() {
+            a.add(carta)
+            Sonido.reproducir(Sonido.carta)
+        }
     }
     
     func nuevaPartida() {
@@ -91,9 +94,19 @@ class BlackjackGame {
         }
     }
     
+    func reproducirSonido() {
+        switch resultado {
+        case .ganaJugador: Sonido.reproducir(Sonido.ganar)
+        case .ganaCrupier: Sonido.reproducir(Sonido.perder)
+        case .empate, .none: break
+        }
+    }
+    
     func terminar() {
         state = .finished
         resolver()
+        reproducirSonido()
+        
     }
     
     func nuevaRonda() {
