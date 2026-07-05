@@ -20,6 +20,7 @@ class BlackjackGame {
         if state != .finished { return nil }
         if playerHand.isBust { return .ganaCrupier }
         if dealerHand.isBust { return .ganaJugador }
+        if playerHand.isBlackjack && !dealerHand.isBlackjack { return .blackjackJugador }
         if playerHand.total > dealerHand.total { return .ganaJugador }
         else if dealerHand.total > playerHand.total { return .ganaCrupier}
         else { return .empate }
@@ -40,6 +41,7 @@ class BlackjackGame {
     }
     
     func nuevaPartida() {
+        baraja = Deck()
         baraja.shuffle()
         playerHand = Hand()
         dealerHand = Hand()
@@ -50,8 +52,7 @@ class BlackjackGame {
         state = .playerTurn
         if dealerHand.isBlackjack {
             terminar()
-        }
-        if playerHand.isBlackjack {
+        } else if playerHand.isBlackjack {
             plantarse()
         }
         
@@ -87,6 +88,7 @@ class BlackjackGame {
     
     func resolver() {
         switch resultado {
+        case .blackjackJugador: saldo += apuesta * 5 / 2
         case .ganaJugador: saldo += apuesta * 2
         case .ganaCrupier: break
         case .empate: saldo += apuesta
@@ -96,7 +98,7 @@ class BlackjackGame {
     
     func reproducirSonido() {
         switch resultado {
-        case .ganaJugador: Sonido.reproducir(Sonido.ganar)
+        case .ganaJugador, .blackjackJugador: Sonido.reproducir(Sonido.ganar)
         case .ganaCrupier: Sonido.reproducir(Sonido.perder)
         case .empate, .none: break
         }
@@ -124,6 +126,7 @@ enum GameState {
 }
 
 enum Resultado {
+    case blackjackJugador
     case ganaJugador
     case ganaCrupier
     case empate

@@ -15,6 +15,7 @@ struct ContentView: View {
             Spacer()
             if let resultado = juego.resultado {
                 switch resultado {
+                case .blackjackJugador: Text("¡Blackjack! 🎉")
                 case .ganaJugador: Text("¡Has ganado!")
                 case .ganaCrupier: Text("Gana el crupier")
                 case .empate: Text("¡Empate!")
