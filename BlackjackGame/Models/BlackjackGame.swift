@@ -116,6 +116,13 @@ class BlackjackGame {
         state = .betting
     }
     
+    func doblar() {
+        saldo -= apuesta
+        apuesta += apuesta
+        repartir(a: &playerHand)
+        plantarse()
+    }
+    
 }
 
 enum GameState {

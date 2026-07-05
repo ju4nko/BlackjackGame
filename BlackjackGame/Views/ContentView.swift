@@ -63,6 +63,11 @@ struct ContentView: View {
                             juego.plantarse()
                         }
                     }
+                    Button("Doblar") {
+                        withAnimation {
+                            juego.doblar()
+                        }
+                    }.disabled(juego.playerHand.cards.count != 2 || juego.saldo < juego.apuesta)
                 }
             case .dealerTurn:
                 EmptyView()
