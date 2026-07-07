@@ -26,12 +26,17 @@ class BlackjackGame {
         else { return .empate }
     }
     
+    var sinSaldo: Bool {
+        saldo < 10
+    }
+    
     init() {
         baraja = Deck()
         playerHand = Hand()
         dealerHand = Hand()
         state = .betting
     }
+    
     
     func repartir(a: inout Hand) {
         if let carta = baraja.draw() {
@@ -121,6 +126,15 @@ class BlackjackGame {
         apuesta += apuesta
         repartir(a: &playerHand)
         plantarse()
+    }
+    
+    func reiniciar() {
+        saldo = 100
+        apuesta = 0
+        baraja = Deck()
+        playerHand = Hand()
+        dealerHand = Hand()
+        state = .betting
     }
     
 }

@@ -41,16 +41,25 @@ struct ContentView: View {
             switch juego.state {
             case .betting:
                 // Botones de apuesta
-                HStack {
-                    Button("10€") { juego.añadirApuesta(10) }.disabled(juego.apuesta + 10 > juego.saldo)
-                    Button("25€") { juego.añadirApuesta(25) }.disabled(juego.apuesta + 25 > juego.saldo)
-                    Button("50€") { juego.añadirApuesta(50) }.disabled(juego.apuesta + 50 > juego.saldo)
-                }
-                Button("Apostar") {
-                    withAnimation {
-                        juego.apostar(juego.apuesta)
+                if juego.sinSaldo {
+                    VStack() {
+                        Text("Te has quedado sin dinero 💸")
+                        Button("Empezar de nuevo") {
+                            juego.reiniciar()
+                        }
                     }
+                } else {
+                    HStack {
+                        Button("10€") { juego.añadirApuesta(10) }.disabled(juego.apuesta + 10 > juego.saldo)
+                        Button("25€") { juego.añadirApuesta(25) }.disabled(juego.apuesta + 25 > juego.saldo)
+                        Button("50€") { juego.añadirApuesta(50) }.disabled(juego.apuesta + 50 > juego.saldo)
+                    }
+                    Button("Apostar") {
+                        withAnimation { juego.apostar(juego.apuesta) }
+                    }.disabled(juego.apuesta == 0)
                 }
+                
+                
             case .playerTurn:
                 HStack {
                     Button("Pedir") {
