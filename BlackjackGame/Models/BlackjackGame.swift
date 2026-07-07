@@ -13,7 +13,11 @@ class BlackjackGame {
     var playerHand: Hand
     var dealerHand: Hand
     var state: GameState
-    var saldo: Int = 100
+    var saldo: Int = 100 {
+        didSet {
+            UserDefaults.standard.set(saldo, forKey: "saldo")
+        }
+    }
     var apuesta: Int = 0
     
     var resultado: Resultado? {
@@ -26,11 +30,14 @@ class BlackjackGame {
         else { return .empate }
     }
     
+    var seguro: Int = 0
+    
     var sinSaldo: Bool {
         saldo < 10
     }
     
     init() {
+        saldo = UserDefaults.standard.object(forKey: "saldo") as? Int ?? 100
         baraja = Deck()
         playerHand = Hand()
         dealerHand = Hand()
@@ -54,13 +61,20 @@ class BlackjackGame {
         repartir(a: &dealerHand)
         repartir(a: &playerHand)
         repartir(a: &dealerHand)
+        if dealerHand.cards.first?.valor == .AS {
+            state = .seguro
+            return
+        }
         state = .playerTurn
+        revelarBlackjackInicial()
+    }
+    
+    func revelarBlackjackInicial() {
         if dealerHand.isBlackjack {
             terminar()
         } else if playerHand.isBlackjack {
             plantarse()
         }
-        
     }
     
     func pedirCarta() {
@@ -118,6 +132,7 @@ class BlackjackGame {
     
     func nuevaRonda() {
         apuesta = 0
+        seguro = 0
         state = .betting
     }
     
@@ -131,10 +146,23 @@ class BlackjackGame {
     func reiniciar() {
         saldo = 100
         apuesta = 0
+        seguro = 0
         baraja = Deck()
         playerHand = Hand()
         dealerHand = Hand()
         state = .betting
+    }
+    
+    func decidirSeguro(comprar: Bool) {
+        if comprar {
+            seguro = apuesta / 2
+            saldo -= seguro
+            if dealerHand.isBlackjack && seguro > 0 {
+                saldo += seguro * 3
+            }
+        }
+        state = .playerTurn
+        revelarBlackjackInicial()
     }
     
 }
@@ -144,6 +172,7 @@ enum GameState {
     case playerTurn
     case dealerTurn
     case finished
+    case seguro
 }
 
 enum Resultado {

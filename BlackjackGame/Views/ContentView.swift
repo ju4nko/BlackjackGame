@@ -26,7 +26,7 @@ struct ContentView: View {
                 
                 HStack {
                     ForEach(Array(juego.dealerHand.cards.enumerated()), id: \.element.id) { indice, card in
-                        CardView(card: card, isFaceDown: indice == 1 && juego.state == .playerTurn)
+                        CardView(card: card, isFaceDown: indice == 1 && (juego.state == .playerTurn || juego.state == .seguro))
                     }
                 }
                 Text("Jugador: \(juego.playerHand.total)")
@@ -83,6 +83,21 @@ struct ContentView: View {
                 
             case .finished:
                 Button("Nueva ronda") { juego.nuevaRonda() }
+                
+            case .seguro:
+                VStack() {
+                    Text("El crupier muestra un As. ¿Quieres seguro?")
+                    HStack {
+                        Button("Sí") {
+                            juego.decidirSeguro(comprar: true)
+                        }.disabled(juego.saldo < juego.apuesta / 2)
+                        Button("No") {
+                            juego.decidirSeguro(comprar: false)
+                        }
+                    }
+                    
+                }
+                
             }
             
             Spacer()
@@ -93,7 +108,7 @@ struct ContentView: View {
     }
     
     var textoCrupier: String {
-        if juego.state == .playerTurn {
+        if juego.state == .playerTurn || juego.state == .seguro {
             if let primera = juego.dealerHand.cards.first {
                 return "\(primera.valor.value)"
             } else {
