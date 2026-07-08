@@ -20,6 +20,7 @@ struct ContentView: View {
                     ForEach(Array(juego.dealerHand.cards.enumerated()), id: \.element.id) { indice, card in
                         CardView(card: card, isFaceDown: indice == 1 && (juego.state == .playerTurn || juego.state == .seguro))
                     }
+                    
                 }
                 ForEach(juego.manosJugador.indices, id: \.self) { indice in
                     VStack {
@@ -32,6 +33,7 @@ struct ContentView: View {
                                 CardView(card: card)
                             }
                         }
+                        
                     }
                     .opacity(indice == juego.manoActiva || juego.state != .playerTurn ? 1 : 0.4)
                 }
@@ -97,10 +99,14 @@ struct ContentView: View {
                     Text("El crupier muestra un As. ¿Quieres seguro?")
                     HStack {
                         Button("Sí") {
-                            juego.decidirSeguro(comprar: true)
+                            withAnimation {
+                                juego.decidirSeguro(comprar: true)
+                            }
                         }.disabled(juego.saldo < juego.apuesta / 2)
                         Button("No") {
-                            juego.decidirSeguro(comprar: false)
+                            withAnimation {
+                                juego.decidirSeguro(comprar: false)
+                            }
                         }
                     }
                     

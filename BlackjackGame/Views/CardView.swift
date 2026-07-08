@@ -29,7 +29,7 @@ struct CardView: View {
         .frame(width: 60, height: 90)
         .rotation3DEffect(.degrees(isFaceDown ? 180 : 0), axis: (x: 0, y: 1, z: 0))
         .animation(.default, value: isFaceDown)
-        .transition(.scale.combined(with: .opacity))
+        .transition(.move(edge: .top).combined(with: .opacity))
     }
     
 }
