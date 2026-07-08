@@ -10,7 +10,8 @@ import Foundation
 @Observable
 class BlackjackGame {
     var baraja: Deck
-    var playerHand: Hand
+    var manosJugador: [Hand] = [Hand()]
+    var manoActiva: Int = 0
     var dealerHand: Hand
     var state: GameState
     var saldo: Int = 100 {
@@ -18,16 +19,13 @@ class BlackjackGame {
             UserDefaults.standard.set(saldo, forKey: "saldo")
         }
     }
+    var apuestaTotal: Int {
+        apuesta * manosJugador.count
+    }
     var apuesta: Int = 0
     
     var resultado: Resultado? {
-        if state != .finished { return nil }
-        if playerHand.isBust { return .ganaCrupier }
-        if dealerHand.isBust { return .ganaJugador }
-        if playerHand.isBlackjack && !dealerHand.isBlackjack { return .blackjackJugador }
-        if playerHand.total > dealerHand.total { return .ganaJugador }
-        else if dealerHand.total > playerHand.total { return .ganaCrupier}
-        else { return .empate }
+        resultado(de: manosJugador[manoActiva])
     }
     
     var seguro: Int = 0
@@ -36,14 +34,29 @@ class BlackjackGame {
         saldo < 10
     }
     
+    var puedeDividir: Bool {
+        manosJugador[manoActiva].cards.count == 2 && manosJugador[manoActiva].cards.first?.valor.value == manosJugador[manoActiva].cards.last?.valor.value && saldo >= apuesta && manosJugador.count == 1
+    }
+    
     init() {
         saldo = UserDefaults.standard.object(forKey: "saldo") as? Int ?? 100
         baraja = Deck()
-        playerHand = Hand()
+        manosJugador = [Hand()]
+        manoActiva = 0
         dealerHand = Hand()
         state = .betting
     }
     
+    
+    func resultado(de mano: Hand) -> Resultado? {
+        if state != .finished { return nil }
+        if mano.isBust { return .ganaCrupier }
+        if mano.isBlackjack && !dealerHand.isBlackjack && manosJugador.count == 1 { return .blackjackJugador }
+        if dealerHand.isBust { return .ganaJugador }
+        if mano.total > dealerHand.total { return .ganaJugador }
+        else if dealerHand.total > mano.total { return .ganaCrupier}
+        else { return .empate }
+    }
     
     func repartir(a: inout Hand) {
         if let carta = baraja.draw() {
@@ -55,11 +68,12 @@ class BlackjackGame {
     func nuevaPartida() {
         baraja = Deck()
         baraja.shuffle()
-        playerHand = Hand()
+        manosJugador = [Hand()]
+        manoActiva = 0
         dealerHand = Hand()
-        repartir(a: &playerHand)
+        repartir(a: &manosJugador[manoActiva])
         repartir(a: &dealerHand)
-        repartir(a: &playerHand)
+        repartir(a: &manosJugador[manoActiva])
         repartir(a: &dealerHand)
         if dealerHand.cards.first?.valor == .AS {
             state = .seguro
@@ -72,22 +86,31 @@ class BlackjackGame {
     func revelarBlackjackInicial() {
         if dealerHand.isBlackjack {
             terminar()
-        } else if playerHand.isBlackjack {
+        } else if manosJugador[manoActiva].isBlackjack {
             plantarse()
         }
     }
     
     func pedirCarta() {
-        repartir(a: &playerHand)
-        if playerHand.isBust {
-            terminar()
-        }
-        if playerHand.total == 21 {
-            plantarse()
+        repartir(a: &manosJugador[manoActiva])
+        if (manosJugador[manoActiva].isBust || manosJugador[manoActiva].total == 21) {
+            avanzarMano()
         }
     }
     
     func plantarse() {
+        avanzarMano()
+    }
+    
+    func avanzarMano() {
+        if manoActiva + 1 < manosJugador.count {
+            manoActiva += 1
+        } else {
+            turnoCrupier()
+        }
+    }
+    
+    func turnoCrupier() {
         state = .dealerTurn
         while dealerHand.total < 17 {
             repartir(a: &dealerHand)
@@ -106,12 +129,14 @@ class BlackjackGame {
     }
     
     func resolver() {
-        switch resultado {
-        case .blackjackJugador: saldo += apuesta * 5 / 2
-        case .ganaJugador: saldo += apuesta * 2
-        case .ganaCrupier: break
-        case .empate: saldo += apuesta
-        case .none: break
+        for mano in manosJugador {
+            switch resultado(de: mano) {
+            case .blackjackJugador: saldo += apuesta * 5 / 2
+            case .ganaJugador: saldo += apuesta * 2
+            case .ganaCrupier: break
+            case .empate: saldo += apuesta
+            case .none: break
+            }
         }
     }
     
@@ -127,7 +152,6 @@ class BlackjackGame {
         state = .finished
         resolver()
         reproducirSonido()
-        
     }
     
     func nuevaRonda() {
@@ -139,7 +163,7 @@ class BlackjackGame {
     func doblar() {
         saldo -= apuesta
         apuesta += apuesta
-        repartir(a: &playerHand)
+        repartir(a: &manosJugador[manoActiva])
         plantarse()
     }
     
@@ -148,7 +172,8 @@ class BlackjackGame {
         apuesta = 0
         seguro = 0
         baraja = Deck()
-        playerHand = Hand()
+        manosJugador = [Hand()]
+        manoActiva = 0
         dealerHand = Hand()
         state = .betting
     }
@@ -163,6 +188,21 @@ class BlackjackGame {
         }
         state = .playerTurn
         revelarBlackjackInicial()
+    }
+    
+    func dividir() {
+        saldo -= apuesta
+        let cartaUno = manosJugador[manoActiva].cards[0]
+        let cartaDos = manosJugador[manoActiva].cards[1]
+        var manoUno = Hand()
+        var manoDos = Hand()
+        manoUno.add(cartaUno)
+        manoDos.add(cartaDos)
+        manosJugador = [manoUno, manoDos]
+        repartir(a: &manosJugador[0])
+        repartir(a: &manosJugador[1])
+        manoActiva = 0
+        state = .playerTurn
     }
     
 }

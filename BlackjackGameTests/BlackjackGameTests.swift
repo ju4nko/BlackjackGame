@@ -38,8 +38,8 @@ struct BlackjackGameTests {
         juego.saldo = 100
         juego.apuesta = 10
         // damos al jugador 20 y al crupier 17
-        juego.playerHand.add(Card(palo: .picas, valor: .K))
-        juego.playerHand.add(Card(palo: .picas, valor: .diez))
+        juego.manosJugador[0].add(Card(palo: .picas, valor: .K))
+        juego.manosJugador[0].add(Card(palo: .picas, valor: .diez))
         juego.dealerHand.add(Card(palo: .corazones, valor: .K))
         juego.dealerHand.add(Card(palo: .corazones, valor: .siete))
         juego.state = .finished        // resolver() necesita que sea finished
@@ -58,8 +58,8 @@ struct BlackjackGameTests {
         juego.saldo = 100
         juego.apuesta = 10
         // damos al jugador 16 y al crupier 17
-        juego.playerHand.add(Card(palo: .picas, valor: .K))
-        juego.playerHand.add(Card(palo: .picas, valor: .seis))
+        juego.manosJugador[0].add(Card(palo: .picas, valor: .K))
+        juego.manosJugador[0].add(Card(palo: .picas, valor: .seis))
         juego.dealerHand.add(Card(palo: .corazones, valor: .K))
         juego.dealerHand.add(Card(palo: .corazones, valor: .siete))
         juego.state = .finished        // resolver() necesita que sea finished
@@ -77,8 +77,8 @@ struct BlackjackGameTests {
         juego.saldo = 100
         juego.apuesta = 10
         // damos al jugador 20 y al crupier 20
-        juego.playerHand.add(Card(palo: .picas, valor: .K))
-        juego.playerHand.add(Card(palo: .picas, valor: .diez))
+        juego.manosJugador[0].add(Card(palo: .picas, valor: .K))
+        juego.manosJugador[0].add(Card(palo: .picas, valor: .diez))
         juego.dealerHand.add(Card(palo: .corazones, valor: .K))
         juego.dealerHand.add(Card(palo: .corazones, valor: .diez))
         juego.state = .finished        // resolver() necesita que sea finished
@@ -96,8 +96,8 @@ struct BlackjackGameTests {
         juego.saldo = 100
         juego.apuesta = 10
         // damos al jugador 21 natural (BLACKJACK) y al crupier 17
-        juego.playerHand.add(Card(palo: .picas, valor: .K))
-        juego.playerHand.add(Card(palo: .picas, valor: .AS))
+        juego.manosJugador[0].add(Card(palo: .picas, valor: .K))
+        juego.manosJugador[0].add(Card(palo: .picas, valor: .AS))
         juego.dealerHand.add(Card(palo: .corazones, valor: .K))
         juego.dealerHand.add(Card(palo: .corazones, valor: .siete))
         juego.state = .finished        // resolver() necesita que sea finished
@@ -109,14 +109,15 @@ struct BlackjackGameTests {
         #expect(juego.saldo == 125)    // 100 + 10 * 5 / 2
     }
     
+    
     @Test func dobleBlackjacEsEmpate() {
         // 1. PREPARAR: montar la situación
         let juego = BlackjackGame()
         juego.saldo = 100
         juego.apuesta = 10
         // damos al jugador BLACKJACK y AL dealer BLACKJACK
-        juego.playerHand.add(Card(palo: .picas, valor: .K))
-        juego.playerHand.add(Card(palo: .picas, valor: .AS))
+        juego.manosJugador[0].add(Card(palo: .picas, valor: .K))
+        juego.manosJugador[0].add(Card(palo: .picas, valor: .AS))
         juego.dealerHand.add(Card(palo: .corazones, valor: .J))
         juego.dealerHand.add(Card(palo: .corazones, valor: .AS))
         juego.state = .finished        // resolver() necesita que sea finished
@@ -128,21 +129,23 @@ struct BlackjackGameTests {
         #expect(juego.saldo == 110)    // 100 + 10
     }
     
+    
+    
     @Test func doblarApuestaEsApostarDoble() {
         // 1. PREPARAR: montar la situación
         let juego =  BlackjackGame()
         juego.saldo = 100
         juego.apuesta = 10
         
-        juego.playerHand.add(Card(palo: .picas, valor: .K))
-        juego.playerHand.add(Card(palo: .picas, valor: .dos))
+        juego.manosJugador[0].add(Card(palo: .picas, valor: .K))
+        juego.manosJugador[0].add(Card(palo: .picas, valor: .dos))
         
         // 2. ACTUAR: doblamos
         juego.doblar()
         
         // 3. COMPROBAR
         #expect(juego.apuesta == 20)
-        #expect(juego.playerHand.cards.count == 3)
+        #expect(juego.manosJugador[0].cards.count == 3)
         
     }
     

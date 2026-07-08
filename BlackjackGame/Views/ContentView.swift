@@ -29,12 +29,18 @@ struct ContentView: View {
                         CardView(card: card, isFaceDown: indice == 1 && (juego.state == .playerTurn || juego.state == .seguro))
                     }
                 }
-                Text("Jugador: \(juego.playerHand.total)")
-                HStack {
-                    ForEach(juego.playerHand.cards) { card in
-                        CardView(card: card)
+                ForEach(juego.manosJugador.indices, id: \.self) { indice in
+                    VStack {
+                        Text("Jugador: \(juego.manosJugador[indice].total)")
+                        HStack {
+                            ForEach(juego.manosJugador[indice].cards) { card in
+                                CardView(card: card)
+                            }
+                        }
                     }
+                    .opacity(indice == juego.manoActiva || juego.state != .playerTurn ? 1 : 0.4)
                 }
+                
             } else {
                 Text("Elija su apuesta")
             }
@@ -76,7 +82,14 @@ struct ContentView: View {
                         withAnimation {
                             juego.doblar()
                         }
-                    }.disabled(juego.playerHand.cards.count != 2 || juego.saldo < juego.apuesta)
+                    }.disabled(juego.manosJugador.count > 1 || juego.manosJugador[juego.manoActiva].cards.count != 2 || juego.saldo < juego.apuesta)
+                    
+                    Button("Dividir") {
+                        withAnimation {
+                            juego.dividir()
+                        }
+                        
+                    }.disabled(!juego.puedeDividir)
                 }
             case .dealerTurn:
                 EmptyView()
@@ -101,7 +114,7 @@ struct ContentView: View {
             }
             
             Spacer()
-            Text("Apuesta total: \(juego.apuesta)€")
+            Text("Apuesta total: \(juego.apuestaTotal)€")
             Text("Saldo: \(juego.saldo)€")
         }
         .padding()
