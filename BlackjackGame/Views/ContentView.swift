@@ -13,14 +13,6 @@ struct ContentView: View {
     var body: some View {
         VStack {
             Spacer()
-            if let resultado = juego.resultado {
-                switch resultado {
-                case .blackjackJugador: Text("¡Blackjack! 🎉")
-                case .ganaJugador: Text("¡Has ganado!")
-                case .ganaCrupier: Text("Gana el crupier")
-                case .empate: Text("¡Empate!")
-                }
-            }
             if juego.state != .betting {
                 Text("Crupier: \(textoCrupier)")
                 
@@ -32,6 +24,9 @@ struct ContentView: View {
                 ForEach(juego.manosJugador.indices, id: \.self) { indice in
                     VStack {
                         Text("Jugador: \(juego.manosJugador[indice].total)")
+                        if let resultadoMano = juego.resultado(de: juego.manosJugador[indice]) {
+                            Text(resultadoMano.mensaje)
+                        }
                         HStack {
                             ForEach(juego.manosJugador[indice].cards) { card in
                                 CardView(card: card)

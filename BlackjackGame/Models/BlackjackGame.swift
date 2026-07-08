@@ -221,3 +221,14 @@ enum Resultado {
     case ganaCrupier
     case empate
 }
+
+extension Resultado {
+    var mensaje: String {
+        switch self {
+        case .blackjackJugador: return "¡Blackjack! 🎉"
+        case .ganaJugador: return "¡Has ganado!"
+        case .ganaCrupier: return "Gana el crupier"
+        case .empate: return "¡Empate!"
+        }
+    }
+}
