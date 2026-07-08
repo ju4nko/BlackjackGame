@@ -22,6 +22,7 @@ struct ContentView: View {
                     }
                     
                 }
+                .animation(.easeOut(duration: 0.3), value: juego.dealerHand.cards.count)
                 ForEach(juego.manosJugador.indices, id: \.self) { indice in
                     VStack {
                         Text("Jugador: \(juego.manosJugador[indice].total)")
@@ -33,6 +34,7 @@ struct ContentView: View {
                                 CardView(card: card)
                             }
                         }
+                        .animation(.easeOut(duration: 0.3), value: juego.manosJugador[indice].cards.count)
                         
                     }
                     .opacity(indice == juego.manoActiva || juego.state != .playerTurn ? 1 : 0.4)
@@ -58,7 +60,7 @@ struct ContentView: View {
                         Button("50€") { juego.añadirApuesta(50) }.disabled(juego.apuesta + 50 > juego.saldo)
                     }
                     Button("Apostar") {
-                        withAnimation { juego.apostar(juego.apuesta) }
+                        Task { await juego.apostar(juego.apuesta) }
                     }.disabled(juego.apuesta == 0)
                 }
                 
@@ -66,28 +68,23 @@ struct ContentView: View {
             case .playerTurn:
                 HStack {
                     Button("Pedir") {
-                        withAnimation {
-                            juego.pedirCarta()
-                        }
+                        Task { await juego.pedirCarta() }
                     }
                     Button("Plantarse") {
-                        withAnimation {
-                            juego.plantarse()
-                        }
+                        Task { await juego.plantarse()}
+                        
                     }
                     Button("Doblar") {
-                        withAnimation {
-                            juego.doblar()
-                        }
+                        Task { await juego.doblar() }
+                        
                     }.disabled(juego.manosJugador.count > 1 || juego.manosJugador[juego.manoActiva].cards.count != 2 || juego.saldo < juego.apuesta)
                     
                     Button("Dividir") {
-                        withAnimation {
-                            juego.dividir()
-                        }
+                        Task { await juego.dividir() }
                         
                     }.disabled(!juego.puedeDividir)
                 }
+                .disabled(juego.repartiendo)
             case .dealerTurn:
                 EmptyView()
                 
@@ -99,17 +96,17 @@ struct ContentView: View {
                     Text("El crupier muestra un As. ¿Quieres seguro?")
                     HStack {
                         Button("Sí") {
-                            withAnimation {
-                                juego.decidirSeguro(comprar: true)
-                            }
+                            
+                            Task { await   juego.decidirSeguro(comprar: true) }
+                            
                         }.disabled(juego.saldo < juego.apuesta / 2)
                         Button("No") {
-                            withAnimation {
-                                juego.decidirSeguro(comprar: false)
-                            }
+                            
+                            Task { await juego.decidirSeguro(comprar: false) }
+                            
                         }
                     }
-                    
+                    .disabled(juego.repartiendo)
                 }
                 
             }

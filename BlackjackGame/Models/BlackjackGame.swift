@@ -14,6 +14,7 @@ class BlackjackGame {
     var manoActiva: Int = 0
     var dealerHand: Hand
     var state: GameState
+    var repartiendo = false
     var saldo: Int = 100 {
         didSet {
             UserDefaults.standard.set(saldo, forKey: "saldo")
@@ -65,63 +66,74 @@ class BlackjackGame {
         }
     }
     
-    func nuevaPartida() {
+    func nuevaPartida() async {
+        repartiendo = true
+        defer { repartiendo = false}
         baraja = Deck()
         baraja.shuffle()
         manosJugador = [Hand()]
         manoActiva = 0
         dealerHand = Hand()
+        state = .playerTurn
+        try? await Task.sleep(for: .milliseconds(350))
         repartir(a: &manosJugador[manoActiva])
+        try? await Task.sleep(for: .milliseconds(350))
         repartir(a: &dealerHand)
+        try? await Task.sleep(for: .milliseconds(350))
         repartir(a: &manosJugador[manoActiva])
+        try? await Task.sleep(for: .milliseconds(350))
         repartir(a: &dealerHand)
+        try? await Task.sleep(for: .milliseconds(350))
         if dealerHand.cards.first?.valor == .AS {
             state = .seguro
             return
         }
-        state = .playerTurn
-        revelarBlackjackInicial()
+        await revelarBlackjackInicial()
     }
     
-    func revelarBlackjackInicial() {
+    func revelarBlackjackInicial() async {
         if dealerHand.isBlackjack {
             terminar()
         } else if manosJugador[manoActiva].isBlackjack {
-            plantarse()
+            await plantarse()
         }
     }
     
-    func pedirCarta() {
+    func pedirCarta() async {
+        repartiendo = true
+        try? await Task.sleep(for: .milliseconds(350))
         repartir(a: &manosJugador[manoActiva])
         if (manosJugador[manoActiva].isBust || manosJugador[manoActiva].total == 21) {
-            avanzarMano()
+            await avanzarMano()
         }
+        repartiendo = false
     }
     
-    func plantarse() {
-        avanzarMano()
+    func plantarse() async {
+        await avanzarMano()
     }
     
-    func avanzarMano() {
+    func avanzarMano() async {
         if manoActiva + 1 < manosJugador.count {
             manoActiva += 1
         } else {
-            turnoCrupier()
+            await turnoCrupier()
         }
     }
     
-    func turnoCrupier() {
+    func turnoCrupier() async {
         state = .dealerTurn
         while dealerHand.total < 17 {
+            try? await Task.sleep(for: .milliseconds(350))
             repartir(a: &dealerHand)
         }
         terminar()
     }
     
 
-    func apostar(_ cantidad: Int) {
+    func apostar(_ cantidad: Int) async {
         saldo -= cantidad     // descuento único aquí
-        nuevaPartida()
+        await nuevaPartida()
     }
     
     func añadirApuesta(_ cantidad: Int) {
@@ -160,11 +172,11 @@ class BlackjackGame {
         state = .betting
     }
     
-    func doblar() {
+    func doblar() async {
         saldo -= apuesta
         apuesta += apuesta
         repartir(a: &manosJugador[manoActiva])
-        plantarse()
+        await plantarse()
     }
     
     func reiniciar() {
@@ -178,7 +190,7 @@ class BlackjackGame {
         state = .betting
     }
     
-    func decidirSeguro(comprar: Bool) {
+    func decidirSeguro(comprar: Bool) async{
         if comprar {
             seguro = apuesta / 2
             saldo -= seguro
@@ -187,10 +199,12 @@ class BlackjackGame {
             }
         }
         state = .playerTurn
-        revelarBlackjackInicial()
+        await revelarBlackjackInicial()
     }
     
-    func dividir() {
+    func dividir() async {
+        repartiendo = true
+        defer { repartiendo = false }
         saldo -= apuesta
         let cartaUno = manosJugador[manoActiva].cards[0]
         let cartaDos = manosJugador[manoActiva].cards[1]
@@ -199,7 +213,9 @@ class BlackjackGame {
         manoUno.add(cartaUno)
         manoDos.add(cartaDos)
         manosJugador = [manoUno, manoDos]
+        try? await Task.sleep(for: .milliseconds(350))
         repartir(a: &manosJugador[0])
+        try? await Task.sleep(for: .milliseconds(350))
         repartir(a: &manosJugador[1])
         manoActiva = 0
         state = .playerTurn

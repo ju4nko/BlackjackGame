@@ -8,6 +8,7 @@
 import Testing
 @testable import BlackjackGame
 
+@MainActor
 struct BlackjackGameTests {
 
     @Test func laBarajaTiene52Cartas() {
@@ -131,7 +132,7 @@ struct BlackjackGameTests {
     
     
     
-    @Test func doblarApuestaEsApostarDoble() {
+    @Test func doblarApuestaEsApostarDoble() async {
         // 1. PREPARAR: montar la situación
         let juego =  BlackjackGame()
         juego.saldo = 100
@@ -141,7 +142,7 @@ struct BlackjackGameTests {
         juego.manosJugador[0].add(Card(palo: .picas, valor: .dos))
         
         // 2. ACTUAR: doblamos
-        juego.doblar()
+        await juego.doblar()
         
         // 3. COMPROBAR
         #expect(juego.apuesta == 20)
