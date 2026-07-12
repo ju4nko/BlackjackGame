@@ -23,6 +23,7 @@ struct SeguroView: View {
             }
             .disabled(juego.repartiendo)
         }
+        .glassEffect(in: .rect(cornerRadius: 20))
     }
 }
 

@@ -32,13 +32,17 @@ struct ContentView: View {
             case .finished: Button("Nueva ronda") { juego.nuevaRonda() }
             case .seguro: SeguroView(juego: juego)
             }
-            
             Spacer()
-            Text("Apuesta total: \(juego.apuestaTotal)€")
-            Text("Saldo: \(juego.saldo)€")
+            VStack {
+                Text("Apuesta total: \(juego.apuestaTotal)€")
+                Text("Saldo: \(juego.saldo)€")
+            }
+            .padding()
+            .glassEffect()
+            
         }
         
-        .buttonStyle(.borderedProminent)
+        .buttonStyle(.glass)
         .padding()
         .foregroundStyle(.white)
         .frame(maxWidth: .infinity)

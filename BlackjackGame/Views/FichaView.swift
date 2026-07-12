@@ -13,7 +13,7 @@ struct FichaView: View {
     var colorFicha: Color  {
         switch valor {
         case 10:  return .red
-        case 25: return .green
+        case 25: return .purple
         case 50: return .blue
         default: return .black
         }
@@ -33,5 +33,5 @@ struct FichaView: View {
 }
 
 #Preview {
-    FichaView(valor: 10)
+    FichaView(valor: 25)
 }
